@@ -1,0 +1,82 @@
+# Reference
+# https://www.linuxtechi.com/install-kubernetes-on-ubuntu-22-04/
+# https://github.com/sysnet4admin/_Lecture_k8s_learning.kit
+
+# number of workers, up to 9
+NUMBER_OF_WORKERS = 2
+
+# vm resource
+VM_CPU = 2
+VM_MEMORY = 2048
+
+# component version
+CONTAINERD_VERSION = "1.6.8"
+KUBERNETES_VERSION = "1.24.6"
+CALICO_VERSION = "3.24.1"
+
+# network cidr
+NODE_IP_NETWORK = "192.168.56"
+POD_IP_NETWORK = "10.244"
+
+# deploy master and worker node
+Vagrant.configure("2") do |config|
+    # based on ubuntu 22.04
+    config.vm.box = "ubuntu/jammy64"
+    # disable update
+    config.vm.box_check_update = false
+    # disable folder sharing
+    config.vm.synced_folder '.', '/vagrant', disabled: true
+
+    # deploy a single master node
+    config.vm.define "kube-master" do |node|
+        # set node spec using virtualbox
+        node.vm.provider "virtualbox" do |virtualbox|
+            # set vm name and resource size, default 2 cpu and 2G memory
+            virtualbox.name = "kube-master"
+            virtualbox.cpus = VM_CPU
+            virtualbox.memory = VM_MEMORY
+        end
+
+        # set hostname
+        node.vm.host_name = "kube-master"
+        # set public node ip, default 192.168.56.10
+        node.vm.network "private_network", ip: "#{NODE_IP_NETWORK}.10"
+        # set ssh connectivity from host
+        node.vm.network "forwarded_port", guest: 22, host: 60010, auto_correct: true, id: "ssh"
+
+        # set network and kernel parameters to install kubenetes
+        node.vm.provision "shell", path: "build_environment.sh", args: [NUMBER_OF_WORKERS, NODE_IP_NETWORK]
+        # install kubernetes-related packages
+        node.vm.provision "shell", path: "install_kubernetes.sh", args: [CONTAINERD_VERSION, KUBERNETES_VERSION]
+        # initialise kubernetes cluster and install network add-on (CNI)
+        node.vm.provision "shell", path: "initialise_kubernetes_cluster.sh", args: [CALICO_VERSION, POD_IP_NETWORK, NODE_IP_NETWORK]
+    end
+
+    # deploy multiple worker nodes
+    (1..NUMBER_OF_WORKERS).each do |worker_no|
+        # loop over each worker
+        config.vm.define "kube-worker-0#{worker_no}" do |node|
+            # set node spec using virtualbox
+            node.vm.provider "virtualbox" do |virtualbox|
+                # set vm name and resource size, default 2 cpu and 2G memory
+                virtualbox.name = "kube-worker-0#{worker_no}"
+                virtualbox.cpus = VM_CPU
+                virtualbox.memory = VM_MEMORY
+            end
+
+            # set hostname
+            node.vm.host_name = "kube-worker-0#{worker_no}"
+            # set public node ip, default 192.168.56.101, 192.168.56.102, ..
+            node.vm.network "private_network", ip: "#{NODE_IP_NETWORK}.10#{worker_no}"
+            # set ssh connectivity from host
+            node.vm.network "forwarded_port", guest: 22, host: "6010#{worker_no}", auto_correct: true, id: "ssh"
+
+            # set network and kernel parameters to install kubenetes
+            node.vm.provision "shell", path: "build_environment.sh", args: [NUMBER_OF_WORKERS, NODE_IP_NETWORK]
+            # install kubernetes-related packages
+            node.vm.provision "shell", path: "install_kubernetes.sh", args: [CONTAINERD_VERSION, KUBERNETES_VERSION]
+            # join the cluster
+            node.vm.provision "shell", path: "join_kubernetes_cluster.sh", args: NODE_IP_NETWORK
+        end
+    end
+end
