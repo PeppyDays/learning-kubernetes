@@ -13,7 +13,7 @@ export KUBECONFIG=/etc/kubernetes/admin.conf
 # https://projectcalico.docs.tigera.io/getting-started/kubernetes/self-managed-onprem/onpremises
 curl https://raw.githubusercontent.com/projectcalico/calico/v$1/manifests/calico.yaml -o /tmp/calico.yaml
 sed -i -e 's/# - name: CALICO_IPV4POOL_CIDR/- name: CALICO_IPV4POOL_CIDR/' /tmp/calico.yaml
-sed -i -e 's/#   value: "192.168.0.0\/16"/  value: "$2.0.0\/16"/' /tmp/calico.yaml
+sed -i -e "s/#   value: \"192.168.0.0\/16\"/  value: \"$2.0.0\/16\"/" /tmp/calico.yaml
 kubectl apply -f /tmp/calico.yaml
 
 # set kubectl-friendly environments for user vagrant
