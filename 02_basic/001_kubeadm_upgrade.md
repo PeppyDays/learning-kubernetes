@@ -17,7 +17,11 @@ $ sudo apt list kubeadm -a
 # install kubeadm and kubelet on kube-master node
 $ sudo apt install kubeadm=1.25.3-00 kubelet=1.25.3-00
 
-# restart kubelet
+# upgrade kubeadm
+$ sudo apt upgrade plan
+$ sudo apt upgrade apply v1.25.3
+
+# restart kubelet, if needed
 $ sudo systemctl restart kubelet
 
 # uncordon control plane
@@ -32,5 +36,5 @@ $ k get no
     kube-worker-02   Ready                      <none>          30m   v1.24.6
 
 # install kubelet and restart kubelet on worker nodes
-$ sudo apt install -y kubelet=1.25.3-00 --allow-change-held-packages && sudo systemctl restart kubelet
+$ sudo apt install -y kubelet=1.25.3-00 --allow-change-held-packages
 ```
