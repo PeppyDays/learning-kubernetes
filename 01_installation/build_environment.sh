@@ -30,3 +30,8 @@ EOF
 
 # reload kernel changes
 sysctl --system
+
+# update packages and install nfs
+apt update
+apt upgrade -y
+apt install nfs-kernel-server nfs-common -y
