@@ -107,6 +107,63 @@ Same as cluster IP, but no dedicated internal IP assigned. This is only accessib
 
 ## Load Balancer
 
-put it later
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: app
+  name: app
+spec:
+  type: LoadBalancer
+  selector:
+    app: app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+```
+
+Get external IP from IP ranges configured in MetalLB, and route traffic to the selected pods via ClusterIP.
 
 ## Ingress
+
+Before starting, need to install ingress controller.
+
+```bash
+-- install ingress nginx controller
+-- https://kubernetes.github.io/ingress-nginx/deploy/#quick-start
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.4.0/deploy/static/provider/cloud/deploy.yaml
+```
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /hn
+        pathType: Prefix
+        backend:
+          service:
+            name: ing-hn
+            port:
+              number: 80
+      - path: /ip
+        pathType: Prefix
+        backend:
+          service:
+            name: ing-ip
+            port:
+              number: 80
+```
+
+Ingress controller creates controller pods and service (in this case, load balancer). Client requests to the service's exposed IP. Ingress controller checks path and routes traffic to configured service and port. rewrite-target option removes the original path and just route with /.
+
+With nginx ingress controller, ingressClassName should be specified as nginx-ingress.
