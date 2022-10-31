@@ -53,8 +53,10 @@ Vagrant.configure("2") do |config|
         node.vm.provision "shell", path: "initialise_kubernetes_cluster.sh", args: [POD_IP_NETWORK, NODE_IP_NETWORK]
         # set up kubernetes network components including cni, load balancer
         node.vm.provision "shell", path: "set_up_kubernetes_network.sh", args: [CALICO_VERSION, METALLB_VERSION, NODE_IP_NETWORK]
-        # set nfs server
+        # set up nfs server
         node.vm.provision "shell", path: "set_up_nfs_server.sh", args: [NODE_IP_NETWORK]
+        # set up nfs storage class
+        node.vm.provision "shell", path: "set_up_nfs_storage_class.sh", args: [NODE_IP_NETWORK]
     end
 
     # deploy multiple worker nodes
