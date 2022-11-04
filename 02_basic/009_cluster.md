@@ -68,6 +68,10 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ```
 
+```bash
+k auth can-i create deployments --as dev --namespace dev
+```
+
 ## Resource Quota
 
 Set resource quota on a namespace. But put it later.
