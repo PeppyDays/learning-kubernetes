@@ -154,3 +154,5 @@ k get no --sort-by=.metadata.name
 
 k get no --sort-by=.status.capacity.cpu
 ```
+
+When using custom columns, be aware that .items should be ommitted.
