@@ -6,8 +6,8 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # install containerd
-apt update
-apt install -q -y containerd.io=$1-1
+apt-get update
+apt-get install -q -y containerd.io=$1-1
 
 # configure containerd for using systemd as cgroup
 containerd config default | tee /etc/containerd/config.toml > /dev/null 2>&1

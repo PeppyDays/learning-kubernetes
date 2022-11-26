@@ -11,9 +11,10 @@ VM_MEMORY = 2048
 
 # component version
 CONTAINERD_VERSION = "1.6.9"
-KUBERNETES_VERSION = "1.24.6"
-CALICO_VERSION = "3.24.3"
+KUBERNETES_VERSION = "1.25.4"
+CALICO_VERSION = "3.24.5"
 METALLB_VERSION = "0.13.7"
+INGRESS_NGINX_VERSION = "1.5.1"
 
 # network cidr
 NODE_IP_NETWORK = "192.168.56"
@@ -52,7 +53,7 @@ Vagrant.configure("2") do |config|
         # initialise kubernetes cluster
         node.vm.provision "shell", path: "initialise_kubernetes_cluster.sh", args: [POD_IP_NETWORK, NODE_IP_NETWORK]
         # set up kubernetes network components including cni, load balancer
-        node.vm.provision "shell", path: "set_up_kubernetes_network.sh", args: [CALICO_VERSION, METALLB_VERSION, NODE_IP_NETWORK]
+        node.vm.provision "shell", path: "set_up_kubernetes_network.sh", args: [CALICO_VERSION, METALLB_VERSION, NODE_IP_NETWORK, INGRESS_NGINX_VERSION]
         # set up nfs server
         node.vm.provision "shell", path: "set_up_nfs_server.sh", args: [NODE_IP_NETWORK]
         # set up nfs storage class

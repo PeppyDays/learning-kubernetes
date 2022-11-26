@@ -32,6 +32,6 @@ EOF
 sysctl --system
 
 # update packages and install nfs
-apt update
-apt upgrade -y
-apt install nfs-kernel-server nfs-common -y
+apt-get update
+apt-get upgrade -y
+apt-get install nfs-kernel-server nfs-common -y
