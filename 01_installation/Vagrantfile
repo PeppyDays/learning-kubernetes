@@ -15,6 +15,7 @@ KUBERNETES_VERSION = "1.25.4"
 CALICO_VERSION = "3.24.5"
 METALLB_VERSION = "0.13.7"
 INGRESS_NGINX_VERSION = "1.5.1"
+METRIC_API_VERSION = "0.6.2"
 
 # network cidr
 NODE_IP_NETWORK = "192.168.56"
@@ -58,6 +59,8 @@ Vagrant.configure("2") do |config|
         node.vm.provision "shell", path: "set_up_nfs_server.sh", args: [NODE_IP_NETWORK]
         # set up nfs storage class
         node.vm.provision "shell", path: "set_up_nfs_storage_class.sh", args: [NODE_IP_NETWORK]
+        # set up monitoring
+        node.vm.provision "shell", path: "set_up_monitoring.sh", args: [METRIC_API_VERSION]
     end
 
     # deploy multiple worker nodes
